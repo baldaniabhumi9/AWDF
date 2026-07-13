@@ -1,12 +1,24 @@
 export default function Projects() {
   const projects = [
     {
-      title: 'Responsive Portfolio',
-      description: 'A polished personal website built with React and modern CSS styling.',
+      title: 'AI-Powered Document Search Portal',
+      description:
+        'Designed and developed an AI-powered document search portal that enables fast, semantic search across large document collections using NLP-based indexing techniques.',
     },
     {
-      title: 'Web App Prototype',
-      description: 'A clean dashboard concept focused on usability and straightforward navigation.',
+      title: 'Healthcare Technology Project',
+      description:
+        'Built an IoT-based healthcare monitoring system using Arduino, microcontrollers, and integrated sensors for real-time neonatal data tracking.',
+    },
+    {
+      title: 'Smart Asset System for Company Handling',
+      description:
+        'Developed a smart asset management solution to streamline company asset tracking, monitoring, and operational workflows.',
+    },
+    {
+      title: 'Core Inventory Project',
+      description:
+        'Implemented a core inventory management system focused on organizing stock data, improving tracking efficiency, and supporting day-to-day business operations.',
     },
   ];
 

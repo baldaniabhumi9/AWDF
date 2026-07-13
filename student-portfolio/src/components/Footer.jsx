@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
     <footer className="footer">
-      <p>© 2026 Bhumi Baldania. All rights reserved.</p>
+      <p>Made by Bhumi Baldania</p>
     </footer>
   );
 }

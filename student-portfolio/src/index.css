@@ -2,12 +2,22 @@
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #1f2937;
-  background: #f4f7fb;
+  color: #14213d;
+  background: #f5f7fd;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --bg: #f5f7fd;
+  --panel: rgba(255, 255, 255, 0.82);
+  --panel-strong: #ffffff;
+  --text: #14213d;
+  --muted: #60708e;
+  --accent: #5b7cff;
+  --accent-2: #7d8df5;
+  --accent-soft: #e9eeff;
+  --border: #e4ebf7;
+  --shadow: 0 18px 45px rgba(20, 33, 61, 0.1);
 }
 
 * {
@@ -16,15 +26,46 @@
 
 body {
   margin: 0;
-  background: linear-gradient(135deg, #f8fbff 0%, #eef4ff 100%);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(123, 143, 245, 0.16), transparent 28%),
+    linear-gradient(135deg, #f8faff 0%, #eef3ff 100%);
+  color: var(--text);
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: auto;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::before {
+  width: 320px;
+  height: 320px;
+  top: -120px;
+  right: -90px;
+  background: radial-gradient(circle, rgba(133, 162, 255, 0.2), transparent 70%);
+}
+
+body::after {
+  width: 280px;
+  height: 280px;
+  bottom: -140px;
+  left: -90px;
+  background: radial-gradient(circle, rgba(173, 202, 255, 0.2), transparent 70%);
 }
 
 #root {
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
 .app-shell {
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 0 auto;
   padding: 24px;
 }
@@ -34,30 +75,35 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  background: #ffffff;
-  border: 1px solid #e5ebf5;
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  background: var(--panel);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(228, 235, 247, 0.95);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 16px;
+  z-index: 10;
 }
 
 .brand-name {
   margin: 0;
-  color: #4378f2;
+  color: var(--accent);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.24em;
   font-size: 0.8rem;
 }
 
 .topbar h1 {
   margin: 4px 0 0;
   font-size: 1.4rem;
-  color: #0f172a;
+  color: var(--text);
 }
 
 .nav-links {
   display: flex;
-  gap: 14px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .nav-links a {
@@ -66,60 +112,69 @@ body {
   font-weight: 600;
   padding: 8px 12px;
   border-radius: 999px;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-.nav-links a:hover {
-  background: #e8f0ff;
-  color: #2463eb;
+.nav-links a:hover,
+.nav-links a:focus-visible {
+  background: var(--accent-soft);
+  color: var(--accent);
+  transform: translateY(-1px);
 }
 
 main {
-  margin-top: 20px;
+  margin-top: 22px;
 }
 
 .page-section {
-  padding: 32px;
-  background: #ffffff;
-  border-radius: 20px;
-  border: 1px solid #e5ebf5;
-  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.05);
+  padding: 34px;
+  background: var(--panel);
+  border-radius: 24px;
+  border: 1px solid rgba(228, 235, 247, 0.95);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
 }
 
 .hero-section {
-  min-height: 420px;
+  min-height: 450px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .hero-card {
-  max-width: 650px;
+  max-width: 700px;
   text-align: center;
+  padding: 26px 24px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(233, 238, 255, 0.82));
+  border: 1px solid rgba(228, 235, 247, 0.95);
+  box-shadow: 0 16px 40px rgba(91, 124, 255, 0.12);
 }
 
 .eyebrow {
   margin: 0 0 10px;
-  color: #4378f2;
+  color: var(--accent);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.24em;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
 }
 
 .hero-card h2,
 .page-section h2 {
   margin: 0 0 12px;
-  color: #0f172a;
+  color: var(--text);
+  letter-spacing: -0.02em;
 }
 
 .hero-card p,
 .page-section p {
-  color: #475569;
+  color: var(--muted);
 }
 
 .button-row {
-  margin-top: 20px;
+  margin-top: 22px;
   display: flex;
   justify-content: center;
   gap: 12px;
@@ -132,38 +187,53 @@ main {
   padding: 10px 16px;
   border-radius: 999px;
   font-weight: 700;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.primary-link:hover,
+.secondary-link:hover,
+.primary-link:focus-visible,
+.secondary-link:focus-visible {
+  transform: translateY(-2px);
 }
 
 .primary-link {
-  background: #2463eb;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: white;
+  box-shadow: 0 10px 22px rgba(91, 124, 255, 0.24);
 }
 
 .secondary-link {
-  background: #eef4ff;
-  color: #2463eb;
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
   margin-top: 20px;
 }
 
 .info-card {
   padding: 18px;
-  background: #f8fbff;
-  border: 1px solid #e5ebf5;
-  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(245, 248, 255, 0.9));
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(91, 124, 255, 0.15);
 }
 
 .skills-panel {
   margin-top: 24px;
   padding: 16px 20px;
-  background: #f8fbff;
-  border-radius: 16px;
-  border: 1px solid #e5ebf5;
+  background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(241, 245, 255, 0.9));
+  border-radius: 18px;
+  border: 1px solid var(--border);
 }
 
 .skills-panel ul {
@@ -175,11 +245,12 @@ main {
 }
 
 .skills-panel li {
-  background: white;
+  background: var(--panel-strong);
   padding: 8px 12px;
   border-radius: 999px;
   color: #334155;
   border: 1px solid #dce7f7;
+  box-shadow: 0 4px 14px rgba(91, 124, 255, 0.07);
 }
 
 .footer {
@@ -209,8 +280,17 @@ main {
 .contact-form textarea {
   padding: 10px 12px;
   border: 1px solid #dbe7f7;
-  border-radius: 10px;
+  border-radius: 12px;
   font: inherit;
+  background: rgba(255, 255, 255, 0.94);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(91, 124, 255, 0.16);
 }
 
 .contact-form button {
@@ -218,10 +298,16 @@ main {
   padding: 10px 16px;
   border: none;
   border-radius: 999px;
-  background: #2463eb;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: white;
   font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 10px 22px rgba(91, 124, 255, 0.24);
+  transition: transform 0.2s ease;
+}
+
+.contact-form button:hover {
+  transform: translateY(-2px);
 }
 
 @media (max-width: 700px) {
@@ -237,5 +323,9 @@ main {
 
   .page-section {
     padding: 24px;
+  }
+
+  .hero-card {
+    padding: 22px 18px;
   }
 }

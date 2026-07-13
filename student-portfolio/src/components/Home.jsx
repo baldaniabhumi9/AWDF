@@ -1,4 +1,6 @@
-export default function Home({ onNavigate }) {
+import { Link } from 'react-router-dom';
+
+export default function Home() {
   return (
     <section className="page-section hero-section">
       <div className="hero-card">
@@ -9,26 +11,12 @@ export default function Home({ onNavigate }) {
           technologies with a strong focus on clean design.
         </p>
         <div className="button-row">
-          <a
-            href="#"
-            className="primary-link"
-            onClick={(event) => {
-              event.preventDefault();
-              onNavigate('about');
-            }}
-          >
+          <Link to="/about" className="primary-link">
             Learn more
-          </a>
-          <a
-            href="#"
-            className="secondary-link"
-            onClick={(event) => {
-              event.preventDefault();
-              onNavigate('projects');
-            }}
-          >
+          </Link>
+          <Link to="/projects" className="secondary-link">
             View projects
-          </a>
+          </Link>
         </div>
       </div>
     </section>
