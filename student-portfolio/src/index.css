@@ -189,6 +189,41 @@ main {
   font-size: 0.95rem;
 }
 
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+  max-width: 560px;
+}
+
+.contact-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #334155;
+  font-weight: 600;
+}
+
+.contact-form input,
+.contact-form textarea {
+  padding: 10px 12px;
+  border: 1px solid #dbe7f7;
+  border-radius: 10px;
+  font: inherit;
+}
+
+.contact-form button {
+  width: fit-content;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 999px;
+  background: #2463eb;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 @media (max-width: 700px) {
   .app-shell {
     padding: 14px;
