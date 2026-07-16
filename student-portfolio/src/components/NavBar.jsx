@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
-export default function NavBar({ studentName }) {
+export default function NavBar({ studentName, isDarkMode, onToggleTheme, showIntro, onToggleIntro }) {
   return (
     <header className="topbar">
       <div>
@@ -8,10 +8,16 @@ export default function NavBar({ studentName }) {
         <h1>Portfolio</h1>
       </div>
       <nav className="nav-links">
-        <Link to="/">Home</Link>
-        <Link to="/projects">Projects</Link>
-        <Link to="/contact">Contact</Link>
-        <Link to="/about">About</Link>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/projects">Projects</NavLink>
+        <NavLink to="/contact">Contact</NavLink>
+        <NavLink to="/about">About</NavLink>
+        <button type="button" className="secondary-link theme-toggle" onClick={onToggleTheme} aria-label="Toggle theme">
+          {isDarkMode ? '☀️' : '🌙'}
+        </button>
+        <button type="button" className="secondary-link" onClick={onToggleIntro}>
+          {showIntro ? 'Hide intro' : 'Show intro'}
+        </button>
       </nav>
     </header>
   );
