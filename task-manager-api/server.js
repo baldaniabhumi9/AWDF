@@ -1,13 +1,23 @@
 const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const Task = require('./models/Task');
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/task-manager-api';
 
-let nextTaskId = 3;
-let tasks = [
-  { id: 1, title: 'Review Express middleware', completed: false },
-  { id: 2, title: 'Test the task API', completed: true },
-];
+mongoose
+  .connect(MONGODB_URI)
+  .then(() => {
+    console.log(`Connected to MongoDB: ${MONGODB_URI}`);
+  })
+  .catch((error) => {
+    console.error('MongoDB connection error:', error.message);
+  });
 
 // Logs every request before it enters the router.
 app.use((req, res, next) => {
@@ -16,6 +26,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+app.use(cors());
 
 // POST and PUT requests must explicitly declare a JSON body.
 app.use((req, res, next) => {
@@ -27,86 +38,93 @@ app.use((req, res, next) => {
   next();
 });
 
-const validateTaskId = (req, res, next) => {
-  if (!/^\d+$/.test(req.params.id)) {
-    return res.status(400).json({ error: 'Task ID must be a positive integer' });
+const formatValidationErrors = (err) => {
+  if (err.name === 'ValidationError') {
+    const details = {};
+    Object.keys(err.errors).forEach((key) => {
+      details[key] = err.errors[key].message;
+    });
+    return {
+      error: 'Validation failed',
+      details,
+    };
   }
 
-  req.taskId = Number(req.params.id);
-  if (!Number.isSafeInteger(req.taskId) || req.taskId < 1) {
-    return res.status(400).json({ error: 'Task ID must be a positive integer' });
+  if (err.name === 'CastError') {
+    return {
+      error: 'Invalid task ID format',
+    };
+  }
+
+  return {
+    error: 'Something went wrong',
+  };
+};
+
+const validateObjectId = (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ error: 'Invalid task ID' });
   }
   next();
 };
 
-const findTask = (taskId) => tasks.find((task) => task.id === taskId);
-
 const tasksRouter = express.Router();
 
-tasksRouter.get('/', (req, res) => {
-  res.status(200).json(tasks);
+tasksRouter.get('/', async (req, res, next) => {
+  try {
+    const tasks = await Task.find().sort({ createdAt: -1 });
+    res.status(200).json(tasks);
+  } catch (error) {
+    next(error);
+  }
 });
 
-tasksRouter.post('/', (req, res, next) => {
-  const { title, completed = false } = req.body;
-
-  if (typeof title !== 'string' || title.trim() === '') {
-    const error = new Error('Task title is required');
-    error.status = 400;
-    return next(error);
+tasksRouter.post('/', async (req, res) => {
+  try {
+    const task = new Task(req.body);
+    const savedTask = await task.save();
+    res.status(201).json(savedTask);
+  } catch (error) {
+    res.status(400).json(formatValidationErrors(error));
   }
-
-  if (typeof completed !== 'boolean') {
-    const error = new Error('Completed must be a boolean');
-    error.status = 400;
-    return next(error);
-  }
-
-  const task = { id: nextTaskId++, title: title.trim(), completed };
-  tasks.push(task);
-  res.status(201).json(task);
 });
 
-tasksRouter.put('/:id', validateTaskId, (req, res, next) => {
-  const task = findTask(req.taskId);
-  if (!task) {
-    const error = new Error('Task not found');
-    error.status = 404;
-    return next(error);
-  }
+tasksRouter.put('/:id', validateObjectId, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
 
-  const { title, completed } = req.body;
-  if (title === undefined && completed === undefined) {
-    const error = new Error('At least one task field is required');
-    error.status = 400;
-    return next(error);
-  }
-  if (title !== undefined && (typeof title !== 'string' || title.trim() === '')) {
-    const error = new Error('Task title must be a non-empty string');
-    error.status = 400;
-    return next(error);
-  }
-  if (completed !== undefined && typeof completed !== 'boolean') {
-    const error = new Error('Completed must be a boolean');
-    error.status = 400;
-    return next(error);
-  }
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
 
-  if (title !== undefined) task.title = title.trim();
-  if (completed !== undefined) task.completed = completed;
-  res.status(200).json(task);
+    const { title, description, completed } = req.body;
+
+    if (title !== undefined) task.title = title;
+    if (description !== undefined) task.description = description;
+    if (completed !== undefined) task.completed = completed;
+
+    const updatedTask = await task.save();
+    return res.status(200).json(updatedTask);
+  } catch (error) {
+    return res.status(400).json(formatValidationErrors(error));
+  }
 });
 
-tasksRouter.delete('/:id', validateTaskId, (req, res, next) => {
-  const taskIndex = tasks.findIndex((task) => task.id === req.taskId);
-  if (taskIndex === -1) {
-    const error = new Error('Task not found');
-    error.status = 404;
-    return next(error);
-  }
+tasksRouter.delete('/:id', validateObjectId, async (req, res) => {
+  try {
+    const task = await Task.findByIdAndDelete(req.params.id);
 
-  const [deletedTask] = tasks.splice(taskIndex, 1);
-  res.status(200).json({ message: 'Task deleted successfully', task: deletedTask });
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    return res.status(200).json({
+      message: 'Task deleted successfully',
+      task,
+    });
+  } catch (error) {
+    return res.status(400).json(formatValidationErrors(error));
+  }
 });
 
 app.use('/tasks', tasksRouter);
@@ -119,10 +137,11 @@ app.use((req, res) => {
   });
 });
 
-// Must remain the final middleware in the pipeline.
 app.use((err, req, res, next) => {
   console.error(err.stack || err.message);
-  res.status(err.status || 500).json({ error: err.status ? err.message : 'Something went wrong' });
+  res.status(err.status || 500).json({
+    error: err.status ? err.message : 'Something went wrong',
+  });
 });
 
 if (require.main === module) {

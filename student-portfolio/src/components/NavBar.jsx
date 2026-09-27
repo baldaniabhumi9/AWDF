@@ -9,7 +9,7 @@ export default function NavBar({ studentName, isDarkMode, onToggleTheme, showInt
       </div>
       <nav className="nav-links">
         <NavLink to="/">Home</NavLink>
-        <NavLink to="/projects">Projects</NavLink>
+        <NavLink to="/tasks">Tasks</NavLink>
         <NavLink to="/contact">Contact</NavLink>
         <NavLink to="/about">About</NavLink>
         <button type="button" className="secondary-link theme-toggle" onClick={onToggleTheme} aria-label="Toggle theme">

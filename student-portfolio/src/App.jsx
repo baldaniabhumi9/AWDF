@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import Home from './components/Home';
 import About from './components/About';
-import Projects from './components/Projects';
+import TaskManager from './components/Projects';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import NotFound from './components/NotFound';
@@ -31,7 +31,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home showIntro={showIntro} />} />
           <Route path="/about" element={<About skills={skills} />} />
-          <Route path="/projects" element={<Projects />} />
+          <Route path="/tasks" element={<TaskManager />} />
+          <Route path="/projects" element={<TaskManager />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -16,8 +16,8 @@ export default function Home({ showIntro }) {
               <Link to="/about" className="primary-link">
                 Learn more
               </Link>
-              <Link to="/projects" className="secondary-link">
-                View projects
+              <Link to="/tasks" className="secondary-link">
+                View tasks
               </Link>
             </div>
           </>
