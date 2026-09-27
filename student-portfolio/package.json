@@ -5,11 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "node server.js",
+    "dev:api": "node --watch server.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "dotenv": "^18.0.4",
+    "express": "^5.2.1",
+    "mongoose": "^8.24.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1"
