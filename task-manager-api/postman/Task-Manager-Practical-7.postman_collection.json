@@ -1,0 +1,254 @@
+{
+  "info": {
+    "_postman_id": "8a30c5f0-96cc-4b0b-a3f2-6e5813d81207",
+    "name": "AWDF Task Manager - Practical 7",
+    "description": "Register and log in, inspect /me, then exercise protected task routes. Select the AWDF Local environment before running requests. Login saves the JWT as a collection variable; Create Task saves its ID.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "taskId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Register (run once per email)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/register",
+        "description": "Creates the account and hashes the password. Expect 201. If this email is already registered, skip to Login."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Registration returns 201', function () { pm.response.to.have.status(201); });"
+            ]
+          }
+        }
+      ],
+      "auth": { "type": "noauth" }
+    },
+    {
+      "name": "2. Login (saves JWT)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/login",
+        "description": "Returns a JWT expiring in one hour. The test script saves the token to this collection for protected requests."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Login returns 200', function () { pm.response.to.have.status(200); });",
+              "if (pm.response.code === 200) { pm.collectionVariables.set('token', pm.response.json().token); }"
+            ]
+          }
+        }
+      ],
+      "auth": { "type": "noauth" }
+    },
+    {
+      "name": "3. Current user (/me)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/me",
+        "description": "Uses the saved collection Bearer token. Expect the current user details without a password."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Current user returns 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response does not contain a password', function () { pm.expect(pm.response.json()).not.to.have.property('password'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Auth required (expect 401)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/tasks",
+        "description": "Intentionally sends no token. Expect 401 AUTH_REQUIRED."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Protected route rejects a missing token', function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ],
+      "auth": { "type": "noauth" }
+    },
+    {
+      "name": "5. Create Task (saves taskId)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Postman Practical 7 task\",\n  \"description\": \"Created through the authenticated API\",\n  \"completed\": false\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/tasks",
+        "description": "Creates a task for the logged-in account and stores its _id as the collection variable taskId."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Task is created', function () { pm.response.to.have.status(201); });",
+              "if (pm.response.code === 201) { pm.collectionVariables.set('taskId', pm.response.json()._id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Get my tasks",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/tasks",
+        "description": "Lists only tasks owned by the logged-in account."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Task list returns 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Update Task",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"completed\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/tasks/{{taskId}}",
+        "description": "Updates the task created by request 5."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Task is updated', function () { pm.response.to.have.status(200); });",
+              "pm.test('Task is marked complete', function () { pm.expect(pm.response.json().completed).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Validate required title (expect 400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Title intentionally omitted\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/tasks",
+        "description": "Intentionally omits title. Expect 400 Validation failed."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Missing task title returns 400', function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Delete Task",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/tasks/{{taskId}}",
+        "description": "Deletes the task created by request 5."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Task is deleted', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

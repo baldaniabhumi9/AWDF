@@ -161,6 +161,39 @@ html.dark-theme .topbar {
   transform: translateY(-1px);
 }
 
+.nav-links .nav-register-link {
+  border: 1px solid #27735d;
+  color: #27735d;
+}
+
+.nav-links .nav-register-link:hover,
+.nav-links .nav-register-link:focus-visible,
+.nav-links .nav-register-link.active {
+  background: #27735d;
+  color: #fff;
+}
+
+.nav-auth-button {
+  align-self: center;
+  min-height: 38px;
+  padding: 7px 13px;
+  border: 1px solid #27735d;
+  border-radius: 6px;
+  background: #27735d;
+  color: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.nav-auth-button:hover,
+.nav-auth-button:focus-visible {
+  background: #1d5e4b;
+  transform: translateY(-1px);
+}
+
 main {
   margin-top: 22px;
 }

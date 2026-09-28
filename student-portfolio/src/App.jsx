@@ -4,6 +4,7 @@ import NavBar from './components/NavBar';
 import Home from './components/Home';
 import About from './components/About';
 import TaskManager from './components/Projects';
+import AuthPage from './components/AuthPage';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import NotFound from './components/NotFound';
@@ -33,6 +34,8 @@ function App() {
           <Route path="/about" element={<About skills={skills} />} />
           <Route path="/tasks" element={<TaskManager />} />
           <Route path="/projects" element={<TaskManager />} />
+          <Route path="/login" element={<AuthPage mode="login" />} />
+          <Route path="/register" element={<AuthPage mode="register" />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

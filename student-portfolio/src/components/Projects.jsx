@@ -1,9 +1,20 @@
 import { useCallback, useEffect, useState } from 'react';
-import { createTask, deleteTask, getTasks, updateTask } from '../api';
+import { useNavigate } from 'react-router-dom';
+import {
+  createTask,
+  deleteTask,
+  getAuthToken,
+  getMe,
+  getTasks,
+  updateTask,
+} from '../api';
 
 export default function TaskManager() {
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [authChecking, setAuthChecking] = useState(true);
+  const [user, setUser] = useState(null);
   const [loadError, setLoadError] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -32,8 +43,26 @@ export default function TaskManager() {
   }, []);
 
   useEffect(() => {
+    const handleAuthExpired = () => {
+      setTasks([]);
+      navigate('/login?expired=1', { replace: true });
+    };
+    window.addEventListener('auth:expired', handleAuthExpired);
+    return () => window.removeEventListener('auth:expired', handleAuthExpired);
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!getAuthToken()) {
+      navigate('/login', { replace: true });
+      return undefined;
+    }
+
     let active = true;
-    getTasks()
+    getMe()
+      .then((currentUser) => {
+        if (active) setUser(currentUser);
+        return getTasks();
+      })
       .then((data) => {
         if (active) setTasks(data);
       })
@@ -41,13 +70,16 @@ export default function TaskManager() {
         if (active) setLoadError(error.message);
       })
       .finally(() => {
-        if (active) setLoading(false);
+        if (active) {
+          setLoading(false);
+          setAuthChecking(false);
+        }
       });
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     if (!notice) return undefined;
@@ -135,6 +167,14 @@ export default function TaskManager() {
   const busy = savingId !== null || deletingId !== null;
   const completedCount = tasks.filter((task) => task.completed).length;
 
+  if (authChecking || !getAuthToken()) {
+    return (
+      <section className="page-section task-page">
+        <div className="task-status" role="status"><span className="spinner" />Checking your session…</div>
+      </section>
+    );
+  }
+
   return (
     <section className="page-section task-page">
       <header className="task-heading">
@@ -142,10 +182,13 @@ export default function TaskManager() {
           <p className="eyebrow">Practical 6 / Full-stack workspace</p>
           <h2>Task manager</h2>
           <p className="section-intro">Your tasks are saved to MongoDB through the Express API.</p>
+          {user && <p className="task-account">Signed in as <strong>{user.email}</strong></p>}
         </div>
-        <div className="task-count" aria-label={`${completedCount} of ${tasks.length} tasks complete`}>
-          <strong>{String(completedCount).padStart(2, '0')}</strong>
-          <span>of {String(tasks.length).padStart(2, '0')} complete</span>
+        <div className="task-heading-tools">
+          <div className="task-count" aria-label={`${completedCount} of ${tasks.length} tasks complete`}>
+            <strong>{String(completedCount).padStart(2, '0')}</strong>
+            <span>of {String(tasks.length).padStart(2, '0')} complete</span>
+          </div>
         </div>
       </header>
 
